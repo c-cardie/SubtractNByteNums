@@ -1,7 +1,3 @@
-;added third call
-;at the very end of the program, I made the SP point to $18
-;to show that I am done
-
 ;first call
 ;load Q = 0x03C3
 LDA #$C3
@@ -40,6 +36,24 @@ LDY #$00
 
 JSR SubNWord
 
+LDA $4000
+STA $04
+LDA $4001
+STA $05
+
+LDY #$00
+
+dereference:
+
+LDA ($04), Y
+
+STA $5000, Y
+
+INY
+
+CPY $01FB
+BNE dereference
+
 ;reset stack pointer for next call
 LDX #$FF
 TXS
@@ -77,6 +91,20 @@ PHA
 LDY #$00
 
 JSR SubNWord
+
+;reset Y
+LDY #$00
+
+dereference2:
+
+LDA ($04), Y
+
+STA $5010, Y
+
+INY
+
+CPY $01FB
+BNE dereference2
 
 ;reset stack pointer for next call
 LDX #$FF
@@ -128,11 +156,22 @@ LDY #$00
 
 JSR SubNWord
 
-;set stack pointer to weird value show we are done :)
-LDX #$18
-TXS
+;reset Y
+LDY #$00
 
-JSR end
+dereference3:
+
+LDA ($04), Y
+
+STA $5020, Y
+
+INY
+
+CPY $01FB
+BNE dereference3
+
+;we are done
+BRK
 
 SubNWord:
 ;put Q's address in zero page
@@ -148,13 +187,14 @@ STA $02
 LDA $0107, X
 STA $03
 
+SEC
+PHP
 loop:
+
+PLP
 
 ;put Q's current byte on A register
 LDA ($00), Y
-
-;set carry bit to 1
-SEC
 
 ;subtract P's current byte from Q's current byte
 SBC ($02), Y
@@ -167,10 +207,14 @@ STA $3000, Y
 ;increment Y before comparing
 INY
 
+PHP
+
 ;have we gone through N bytes?
 CPY $01FB
 ;if not, repeat subtraction on next byte
 BNE loop
+
+PLP
 
 ;returning address where subtraction result is stored
 
@@ -187,7 +231,3 @@ LDA $0104, X
 STA $4001
 
 RTS
-
-end:
-BRK
-
