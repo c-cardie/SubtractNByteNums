@@ -7,10 +7,10 @@ STA $0200
 LDA #$03
 STA $0201
 
-;load R = 0xFF24
-LDA #$24
+;load R = 0x01C3
+LDA #$C3
 STA $0202
-LDA #$FF
+LDA #$01
 STA $0203
 
 ;Put Q's address on the stack
@@ -225,8 +225,6 @@ LDA ($00), Y
 
 ;subtract P's current byte from Q's current byte
 SBC ($02), Y
-
-;do I clear the carry here?
 
 ;store A (result of subtraction)
 STA $3000, Y
